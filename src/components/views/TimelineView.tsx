@@ -4,19 +4,25 @@ import type { Battle, YearRange } from "../../types/domain";
 type TimelineViewProps = {
   battles: Battle[];
   selectedBattleId: string | null;
+  allYearRange: YearRange;
   selectedYearRange: YearRange;
+  currentYear: number;
   onSelectBattle: (battleId: string) => void;
-  onYearRangeChange: (range: YearRange) => void;
+  onCurrentYearChange: (year: number) => void;
 };
 
 export function TimelineView({
   battles,
   selectedBattleId,
+  allYearRange,
   selectedYearRange,
+  currentYear,
   onSelectBattle,
-  onYearRangeChange,
+  onCurrentYearChange,
 }: TimelineViewProps) {
   const sortedBattles = [...battles].sort((a, b) => a.year - b.year);
+  const [absoluteMinYear, absoluteMaxYear] = allYearRange;
+  const [minYear, maxYear] = selectedYearRange;
 
   return (
     <section className="view-panel timeline-panel">
@@ -25,31 +31,25 @@ export function TimelineView({
         <h2>Timeline View</h2>
       </div>
       <div className="timeline-range">
-        <span>{selectedYearRange[0]}</span>
+        <span>{minYear}</span>
         <input
           type="range"
-          min={1500}
-          max={1945}
-          value={selectedYearRange[0]}
-          onChange={(event) =>
-            onYearRangeChange([Math.min(Number(event.target.value), selectedYearRange[1]), selectedYearRange[1]])
-          }
-          aria-label="Timeline start year"
+          min={minYear}
+          max={maxYear}
+          value={currentYear}
+          onChange={(event) => onCurrentYearChange(Number(event.target.value))}
+          aria-label="Timeline current year"
         />
-        <input
-          type="range"
-          min={1500}
-          max={1945}
-          value={selectedYearRange[1]}
-          onChange={(event) =>
-            onYearRangeChange([selectedYearRange[0], Math.max(Number(event.target.value), selectedYearRange[0])])
-          }
-          aria-label="Timeline end year"
-        />
-        <span>{selectedYearRange[1]}</span>
+        <span>{maxYear}</span>
+      </div>
+      <div className="timeline-current-year" aria-label="Current timeline year">
+        {currentYear}
+        <small>
+          window {absoluteMinYear}-{absoluteMaxYear}
+        </small>
       </div>
       {sortedBattles.length === 0 ? (
-        <div className="empty-state">The selected time window has no battles.</div>
+        <div className="empty-state">The selected time window has no conflict events.</div>
       ) : (
         <div className="timeline-track">
           {sortedBattles.map((battle) => (

@@ -1,34 +1,30 @@
 # BattleMap
 
-世界战争与战役时空演化可视分析系统。
+全球军事冲突事件时空可视分析系统。
 
-本项目是课程可视化项目的前端 Demo 壳子，当前版本使用 mock 数据先跑通系统结构、全局筛选、统计面板、详情面板、case study，以及地图、时间轴、网络图之间的组件接口。后续 A/B 成员可以在不改整体集成逻辑的前提下替换真实数据和核心可视化实现。
+本项目是课程可视化项目的前端 Demo。当前主数据已从早期 mock battle 数据切换为 HCED（Historical Conflict Event Dataset）军事冲突事件点，历史边界辅助层使用 CShapes 2.0。第一版固定分析范围为 1886-2003，使 HCED 事件点与 CShapes 历史国家/领土边界能在时间上完整叠加。
 
 ## 项目目标
 
-BattleMap 面向“战争/战役时空演化分析”主题，计划分析 1500-1945 年欧洲战争与战役，或进一步聚焦二战主要战役。系统希望回答的问题包括：
+系统面向全球军事冲突事件的时空可视分析，重点回答：
 
-- 战役在不同时间阶段如何从局部地区扩散到更大范围。
-- 哪些地区是高频冲突区。
-- 不同国家或阵营之间的交战关系如何变化。
-- 某些战争中战役的空间推进方向是否明显。
+- 冲突事件在不同年份和地区如何分布。
+- 高频冲突区随时间如何变化。
+- 参战方之间的共现关系如何变化。
+- 事件类型、冲突组和历史边界背景之间有什么空间关系。
 
-当前 Demo 的重点不是最终视觉效果，而是把系统架构和协作接口先稳定下来。
+注意：HCED 记录的是 military conflict event，不承诺每条记录都是严格意义上的 battle。CShapes 2.0 表示国家/领土边界，不表示战线、占领区或实际控制线。
 
 ## 当前功能
 
 - React + Vite + TypeScript 项目骨架。
-- mock 战役、战争、参战方数据。
+- HCED 1886-2003 冲突事件 CSV 数据读取。
 - 全局筛选器：
-  - 按战争筛选。
+  - 按 conflict group 筛选。
   - 按年份范围筛选。
   - 按参战方筛选。
-- 地图视图占位组件 `MapView`。
-- 时间轴视图占位组件 `TimelineView`。
-- 参战方网络图占位组件 `NetworkView`。
-- 统计面板 `StatisticsPanel`。
-- 战役详情面板 `DetailPanel`。
-- case study 快捷筛选区 `CaseStudyPanel`。
+- Leaflet 地图：HCED 事件点叠加 CShapes 2.0 历史边界快照。
+- 时间轴视图、参战方网络视图、统计面板、详情面板和 case study 快捷筛选。
 - 筛选与统计核心逻辑测试。
 
 ## 快速开始
@@ -63,79 +59,64 @@ npm test
 npm run build
 ```
 
-预览构建结果：
+## 数据生成
+
+生成 HCED 前端事件 CSV：
 
 ```bash
-npm run preview
+npm run build:hced
 ```
 
-## 目录结构
+脚本会优先读取 `/private/tmp/hced-data-v3.csv`。如果不存在，则从 Harvard Dataverse 下载 HCED Data v3：
 
 ```text
-.
-├── src
-│   ├── App.tsx
-│   ├── components
-│   │   ├── filters
-│   │   ├── layout
-│   │   ├── panels
-│   │   └── views
-│   ├── data
-│   │   └── mockData.ts
-│   ├── hooks
-│   │   └── useBattleData.ts
-│   ├── lib
-│   │   ├── battleAnalytics.ts
-│   │   └── battleAnalytics.test.ts
-│   ├── main.tsx
-│   ├── styles.css
-│   └── types
-│       └── domain.ts
-├── topic.pdf
-├── package.json
-└── vite.config.ts
+https://dataverse.harvard.edu/api/access/datafile/13390255
 ```
 
-## 数据模型
+输出文件：
 
-核心类型定义在 `src/types/domain.ts`。
-
-```ts
-type Battle = {
-  id: string;
-  name: string;
-  warId: string;
-  year: number;
-  startDate?: string;
-  endDate?: string;
-  latitude: number;
-  longitude: number;
-  locationName?: string;
-  participants: string[];
-  result?: string;
-  type?: string;
-  description?: string;
-};
-
-type War = {
-  id: string;
-  name: string;
-  startYear: number;
-  endYear: number;
-  description?: string;
-};
-
-type Participant = {
-  id: string;
-  name: string;
-  side?: string;
-  type?: "country" | "empire" | "alliance" | "other";
-};
+```text
+public/data/hced/conflict_events.csv
 ```
 
-## 数据接口约定
+生成 CShapes 1886-2003 历史边界快照：
 
-当前 `src/hooks/useBattleData.ts` 返回 mock 数据。A 成员后续接入 Wikidata/CSV 后，只需要保持这个 hook 的返回结构不变：
+```bash
+npm run build:cshapes
+```
+
+脚本会优先读取 `/private/tmp/cshapes-2.0.geojson`。如果不存在，则从 CShapes 官方地址下载：
+
+```text
+https://icr.ethz.ch/data/cshapes/CShapes-2.0.geojson
+```
+
+输出文件：
+
+```text
+public/data/cshapes/cshapes_1886_2003_snapshots.geojson
+```
+
+CShapes 第一版按十年生成 `1890, 1900, ..., 2000`，并额外加入 `1914, 1918, 1939, 1945, 1991, 2003`。
+
+## 数据接口
+
+`public/data/hced/conflict_events.csv` 字段：
+
+- `event_id`
+- `event_name`
+- `war_name`
+- `year`
+- `location_name`
+- `latitude`
+- `longitude`
+- `participants`
+- `outcome`
+- `event_type`
+- `narrative`
+- `source`
+
+`useBattleData()` 仍保留原有返回结构，方便现有组件继续复用：
 
 ```ts
 useBattleData(): {
@@ -147,85 +128,54 @@ useBattleData(): {
 };
 ```
 
-建议真实数据文件保持以下语义：
+其中 `battles` 实际由 HCED conflict events 映射而来：
 
-- `battles.csv`：战役事件主表。
-- `wars.csv`：战争元信息表。
-- `participants.csv`：参战方信息表。
+- `id` = `event_id`
+- `name` = `event_name`
+- `warId` = `war_name` slug
+- `year` = `year`
+- `latitude` / `longitude` = HCED coordinates
+- `locationName` = `location_name`
+- `participants` = `participants` parsed to IDs
+- `result` = `outcome`
+- `type` = `event_type`
+- `description` = `narrative`
+- `source` = `source`
 
-只要清洗后的字段能映射到 `Battle`、`War`、`Participant`，C 的页面集成和 B 的组件接口就不需要重写。
+早期 `src/data/mockData.ts` 仅保留为开发参考，前端默认不再使用。
 
-## 组件接口约定
+## 目录结构
 
-B 成员后续可以替换地图、时间轴和网络图内部实现，但建议保持 props 接口稳定：
-
-```tsx
-<MapView
-  battles={filteredBattles}
-  selectedBattleId={selectedBattleId}
-  onSelectBattle={setSelectedBattleId}
-/>
-
-<TimelineView
-  battles={filteredBattles}
-  selectedBattleId={selectedBattleId}
-  selectedYearRange={selectedYearRange}
-  onSelectBattle={setSelectedBattleId}
-  onYearRangeChange={setSelectedYearRange}
-/>
-
-<NetworkView
-  battles={filteredBattles}
-  participants={participants}
-  selectedParticipant={selectedParticipant}
-  onSelectParticipant={setSelectedParticipant}
-/>
+```text
+.
+├── public/data
+│   ├── cshapes
+│   └── hced
+├── scripts
+│   ├── build-cshapes-snapshots.mjs
+│   └── build-hced-conflict-events.mjs
+├── src
+│   ├── App.tsx
+│   ├── components
+│   ├── data/mockData.ts
+│   ├── hooks/useBattleData.ts
+│   ├── lib
+│   └── types/domain.ts
+├── package.json
+└── vite.config.ts
 ```
-
-这样地图、时间轴、网络图可以通过同一套全局状态联动。
-
-## 分工边界
-
-成员 A 重点负责：
-
-- Wikidata SPARQL 查询。
-- 原始数据下载和清洗。
-- `battles.csv`、`wars.csv`、`participants.csv` 构建。
-- 坐标清洗与校准。
-- 后续替换 `useBattleData` 的真实数据读取逻辑。
-- 地图视图的真实数据表达。
-
-成员 B 重点负责：
-
-- `TimelineView` 的正式实现。
-- `NetworkView` 的正式实现。
-- 时间轴与网络图的交互细节。
-- 战役、战争、参战方之间的关系构建。
-
-成员 C 重点负责：
-
-- React/Vite 项目框架。
-- 页面整体布局。
-- 全局筛选器和状态管理。
-- `StatisticsPanel`、`DetailPanel`、`CaseStudyPanel`。
-- 组件集成、UI 统一、部署和 README。
-
-## 后续开发建议
-
-1. A 先输出一版小规模真实 CSV，并保证字段能映射到当前类型。
-2. C 将 `useBattleData` 从 mock 数据替换为 CSV 读取。
-3. B 在现有 props 基础上替换 `TimelineView` 和 `NetworkView` 内部实现。
-4. A 或 B 替换 `MapView` 为真实地图组件。
-5. C 补充 GitHub Pages 部署配置、AI 使用声明、答辩材料和 demo 视频。
 
 ## 技术栈
 
 - React
 - Vite
 - TypeScript
+- Leaflet
 - Vitest
 - lucide-react
 
-## 备注
+## 数据说明
 
-当前版本是系统壳子与协作接口 Demo，不代表最终可视化质量。真实数据接入后，需要进一步检查缺失坐标、缺失时间、参战方命名不一致、同一战役多地点等数据问题。
+HCED 数据来源为 Charles Miller 的 Historical Conflict Event Dataset。当前脚本使用 Dataverse 上的 `HCED Data v3.csv`，过滤 `1886 <= year <= 2003` 且保留有经纬度的事件。
+
+CShapes 2.0 仅作为历史国家/领土边界背景层。它不表示前线、占领区或战场控制范围，地图中的事件点与边界叠加只用于时空背景分析。

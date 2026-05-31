@@ -23,7 +23,7 @@ export function StatisticsPanel({ summary, wars, participants }: StatisticsPanel
       <div className="stat-grid">
         <div>
           <strong>{summary.totalBattles}</strong>
-          <span>Battles</span>
+          <span>Conflict events</span>
         </div>
         <div>
           <strong>{summary.yearRange ? `${summary.yearRange[0]}-${summary.yearRange[1]}` : "None"}</strong>
@@ -40,7 +40,7 @@ export function StatisticsPanel({ summary, wars, participants }: StatisticsPanel
         ))}
       </div>
       <div className="mini-section">
-        <h3>Battle types</h3>
+        <h3>Event types</h3>
         {Object.entries(summary.battlesByType).map(([type, count]) => (
           <div className="bar-row" key={type}>
             <span>{type}</span>
@@ -52,7 +52,7 @@ export function StatisticsPanel({ summary, wars, participants }: StatisticsPanel
         ))}
       </div>
       <div className="mini-section">
-        <h3>Wars represented</h3>
+        <h3>Conflict groups</h3>
         {Object.entries(summary.battlesByWar).map(([warId, count]) => (
           <div className="rank-row" key={warId}>
             <span>{lookupName(warId, wars)}</span>

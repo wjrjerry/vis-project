@@ -19,14 +19,14 @@ export function DetailPanel({ battle, wars, participants }: DetailPanelProps) {
         <h2>Detail</h2>
       </div>
       {!battle ? (
-        <div className="empty-state">Select a battle to inspect its fields.</div>
+        <div className="empty-state">Select a conflict event to inspect its fields.</div>
       ) : (
         <>
           <h3>{battle.name}</h3>
           <p>{battle.description}</p>
           <dl className="detail-list">
             <div>
-              <dt>War</dt>
+              <dt>Conflict group</dt>
               <dd>{lookupName(battle.warId, wars)}</dd>
             </div>
             <div>
@@ -42,11 +42,31 @@ export function DetailPanel({ battle, wars, participants }: DetailPanelProps) {
             </div>
             <div>
               <dt>Participants</dt>
-              <dd>{battle.participants.map((id) => lookupName(id, participants)).join(", ")}</dd>
+              <dd>
+                {battle.participantNames?.length
+                  ? battle.participantNames.join(", ")
+                  : battle.participants.map((id) => lookupName(id, participants)).join(", ")}
+              </dd>
+            </div>
+            <div>
+              <dt>Winner</dt>
+              <dd>{battle.winnerNames?.join(", ") || "Unknown"}</dd>
+            </div>
+            <div>
+              <dt>Loser</dt>
+              <dd>{battle.loserNames?.join(", ") || "Unknown"}</dd>
             </div>
             <div>
               <dt>Result</dt>
               <dd>{battle.result ?? "Unknown"}</dd>
+            </div>
+            <div>
+              <dt>Type</dt>
+              <dd>{battle.type ?? "Conflict event"}</dd>
+            </div>
+            <div>
+              <dt>Source</dt>
+              <dd>{battle.source ?? "Historical Conflict Event Dataset"}</dd>
             </div>
           </dl>
         </>

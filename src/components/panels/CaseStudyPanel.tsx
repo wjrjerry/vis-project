@@ -17,12 +17,12 @@ export function CaseStudyPanel({ onSelectWar, onYearRangeChange }: CaseStudyPane
         <button
           type="button"
           onClick={() => {
-            onSelectWar("napoleonic-wars");
-            onYearRangeChange([1803, 1815]);
+            onSelectWar("world-war-i");
+            onYearRangeChange([1914, 1918]);
           }}
         >
-          <strong>Napoleonic spread</strong>
-          <span>Follow coalition battles from central Europe to Russia and Belgium.</span>
+          <strong>World War I</strong>
+          <span>Inspect HCED events around the 1914-1918 global conflict window.</span>
         </button>
         <button
           type="button"
@@ -31,8 +31,8 @@ export function CaseStudyPanel({ onSelectWar, onYearRangeChange }: CaseStudyPane
             onYearRangeChange([1939, 1945]);
           }}
         >
-          <strong>World War II Europe</strong>
-          <span>Trace early invasion, air defense, eastern reversal, and western landing.</span>
+          <strong>World War II</strong>
+          <span>Trace global event points over 1939-1945 with historical country boundaries.</span>
         </button>
       </div>
     </section>

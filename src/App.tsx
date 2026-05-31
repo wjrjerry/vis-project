@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FilterPanel } from "./components/filters/FilterPanel";
 import { AppHeader } from "./components/layout/AppHeader";
 import { AppShell } from "./components/layout/AppShell";
@@ -9,12 +9,7 @@ import { MapView } from "./components/views/MapView";
 import { NetworkView } from "./components/views/NetworkView";
 import { TimelineView } from "./components/views/TimelineView";
 import { useBattleData } from "./hooks/useBattleData";
-import {
-  filterBattles,
-  getBattleYearRange,
-  getSelectedBattle,
-  summarizeBattles,
-} from "./lib/battleAnalytics";
+import { filterBattles, getBattleYearRange, getSelectedBattle, summarizeBattles } from "./lib/battleAnalytics";
 import type { YearRange } from "./types/domain";
 
 export default function App() {
@@ -22,8 +17,18 @@ export default function App() {
   const allYearRange = useMemo(() => getBattleYearRange(battles), [battles]);
   const [selectedWarId, setSelectedWarId] = useState<string | null>("all");
   const [selectedYearRange, setSelectedYearRange] = useState<YearRange>(allYearRange);
+  const [currentYear, setCurrentYear] = useState(allYearRange[1]);
   const [selectedParticipant, setSelectedParticipant] = useState<string | null>(null);
-  const [selectedBattleId, setSelectedBattleId] = useState<string | null>(battles[0]?.id ?? null);
+  const [selectedBattleId, setSelectedBattleId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (battles.length === 0) {
+      return;
+    }
+
+    setSelectedYearRange(allYearRange);
+    setCurrentYear(allYearRange[1]);
+  }, [allYearRange, battles]);
 
   const filteredBattles = useMemo(
     () =>
@@ -36,17 +41,32 @@ export default function App() {
   );
 
   const summary = useMemo(() => summarizeBattles(filteredBattles), [filteredBattles]);
+  const mapBattles = useMemo(
+    () => filteredBattles.filter((battle) => battle.year === currentYear),
+    [currentYear, filteredBattles],
+  );
   const selectedBattle = useMemo(
-    () => getSelectedBattle(filteredBattles, selectedBattleId) ?? filteredBattles[0] ?? null,
-    [filteredBattles, selectedBattleId],
+    () => getSelectedBattle(mapBattles, selectedBattleId),
+    [mapBattles, selectedBattleId],
   );
 
+  function updateYearRange(range: YearRange) {
+    setSelectedYearRange(range);
+    setCurrentYear((year) => Math.min(Math.max(year, range[0]), range[1]));
+    setSelectedBattleId(null);
+  }
+
+  function updateCurrentYear(year: number) {
+    setCurrentYear(year);
+    setSelectedBattleId(null);
+  }
+
   if (loading) {
-    return <div className="screen-message">Loading BattleMap data...</div>;
+    return <div className="screen-message">Loading HCED conflict events...</div>;
   }
 
   if (error) {
-    return <div className="screen-message">Failed to load battle data: {error.message}</div>;
+    return <div className="screen-message">Failed to load conflict event data: {error.message}</div>;
   }
 
   return (
@@ -54,8 +74,8 @@ export default function App() {
       header={
         <AppHeader
           totalBattles={battles.length}
-          filteredBattles={filteredBattles.length}
-          yearRange={summary.yearRange ?? selectedYearRange}
+          filteredBattles={mapBattles.length}
+          yearRange={[currentYear, currentYear]}
         />
       }
       filters={
@@ -67,23 +87,26 @@ export default function App() {
           selectedYearRange={selectedYearRange}
           selectedParticipant={selectedParticipant}
           onWarChange={(warId) => setSelectedWarId(warId)}
-          onYearRangeChange={setSelectedYearRange}
+          onYearRangeChange={updateYearRange}
           onParticipantChange={(participantId) => setSelectedParticipant(participantId)}
         />
       }
       primary={
         <>
           <MapView
-            battles={filteredBattles}
-            selectedBattleId={selectedBattle?.id ?? selectedBattleId}
+            battles={mapBattles}
+            selectedBattleId={selectedBattleId}
+            currentYear={currentYear}
             onSelectBattle={setSelectedBattleId}
           />
           <TimelineView
             battles={filteredBattles}
-            selectedBattleId={selectedBattle?.id ?? selectedBattleId}
+            selectedBattleId={selectedBattleId}
+            allYearRange={allYearRange}
             selectedYearRange={selectedYearRange}
+            currentYear={currentYear}
             onSelectBattle={setSelectedBattleId}
-            onYearRangeChange={setSelectedYearRange}
+            onCurrentYearChange={updateCurrentYear}
           />
           <NetworkView
             battles={filteredBattles}
@@ -97,7 +120,7 @@ export default function App() {
         <>
           <StatisticsPanel summary={summary} wars={wars} participants={participants} />
           <DetailPanel battle={selectedBattle} wars={wars} participants={participants} />
-          <CaseStudyPanel onSelectWar={setSelectedWarId} onYearRangeChange={setSelectedYearRange} />
+          <CaseStudyPanel onSelectWar={setSelectedWarId} onYearRangeChange={updateYearRange} />
         </>
       }
     />

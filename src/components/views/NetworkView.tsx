@@ -45,7 +45,7 @@ export function NetworkView({ battles, participants, selectedParticipant, onSele
                 onClick={() => onSelectParticipant(selected ? null : participant.id)}
               >
                 <span>{participant.name}</span>
-                <small>{counts.get(participant.id)} battles</small>
+                <small>{counts.get(participant.id)} events</small>
               </button>
             );
           })}

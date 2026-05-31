@@ -192,7 +192,7 @@ h1 {
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(19rem, 24rem);
+  grid-template-columns: 1fr;
   gap: 1rem;
 }
 
@@ -203,7 +203,8 @@ h1 {
 }
 
 .map-panel {
-  min-height: 25rem;
+  grid-column: 1 / -1;
+  min-height: calc(100vh - 2rem);
 }
 
 .timeline-panel,
@@ -222,6 +223,7 @@ h1 {
 
 .sidebar-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
   align-content: start;
   gap: 1rem;
 }
@@ -248,18 +250,175 @@ h1 {
 }
 
 .map-stage {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(12rem, 15rem);
-  gap: 1rem;
-  min-height: 20rem;
+  position: relative;
+  min-height: calc(100vh - 8rem);
 }
 
-.map-stage svg {
-  width: 100%;
-  min-height: 20rem;
+.leaflet-map-shell {
+  position: relative;
+  min-height: calc(100vh - 8rem);
+  overflow: hidden;
   border: 1px solid rgba(238, 240, 234, 0.08);
   border-radius: 8px;
-  background: linear-gradient(160deg, rgba(134, 197, 199, 0.13), rgba(18, 20, 22, 0.92));
+  background: #121416;
+}
+
+.leaflet-map {
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 8rem);
+  background: #121416;
+}
+
+.leaflet-container {
+  font: inherit;
+}
+
+.leaflet-control-zoom a {
+  color: var(--ink);
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--surface);
+  color: var(--text-soft);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.26);
+}
+
+.leaflet-popup-content {
+  margin: 0.75rem;
+}
+
+.battle-popup {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 11rem;
+}
+
+.battle-popup strong {
+  color: var(--gold);
+}
+
+.battle-popup span {
+  color: var(--text-muted);
+}
+
+.map-empty-overlay {
+  position: absolute;
+  inset: auto 1rem 1rem;
+  z-index: 500;
+  display: grid;
+  min-height: 3rem;
+  place-items: center;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: rgba(16, 18, 20, 0.82);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.boundary-control {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  z-index: 500;
+  display: grid;
+  gap: 0.6rem;
+  width: min(19rem, calc(100% - 2rem));
+  padding: 0.7rem;
+  border: 1px solid rgba(238, 240, 234, 0.12);
+  border-radius: 8px;
+  background: rgba(16, 18, 20, 0.84);
+  color: var(--text-soft);
+  backdrop-filter: blur(10px);
+}
+
+.boundary-control label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.boundary-control label span {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.boundary-control select {
+  width: 100%;
+  height: 2.15rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #151719;
+  color: var(--text-soft);
+  padding: 0 0.55rem;
+}
+
+.boundary-control small {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.boundary-legend {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.boundary-legend div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.boundary-legend span {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex: 0 0 auto;
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  background: var(--legend-color);
+}
+
+.boundary-legend strong {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+
+.map-legend {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 500;
+  display: grid;
+  gap: 0.45rem;
+  width: min(18rem, calc(100% - 2rem));
+  padding: 0.65rem;
+  border: 1px solid rgba(238, 240, 234, 0.12);
+  border-radius: 8px;
+  background: rgba(16, 18, 20, 0.84);
+  color: var(--text-soft);
+  backdrop-filter: blur(10px);
+}
+
+.map-legend div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.map-legend span {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex: 0 0 auto;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--legend-color);
+}
+
+.map-legend strong {
+  font-size: 0.78rem;
+  color: var(--text-soft);
 }
 
 .map-shape {
@@ -303,6 +462,21 @@ h1 {
   gap: 0.5rem;
 }
 
+.map-list {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 500;
+  width: min(18rem, calc(100% - 2rem));
+  max-height: calc(100% - 2rem);
+  overflow: auto;
+  padding: 0.55rem;
+  border: 1px solid rgba(238, 240, 234, 0.12);
+  border-radius: 8px;
+  background: rgba(16, 18, 20, 0.84);
+  backdrop-filter: blur(10px);
+}
+
 .list-link,
 .timeline-item,
 .network-node,
@@ -318,11 +492,32 @@ h1 {
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+  min-height: 3rem;
   padding: 0.65rem;
 }
 
 .list-link small {
   color: var(--gold);
+}
+
+.map-selection {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.7rem;
+  border: 1px solid rgba(214, 182, 106, 0.35);
+  border-radius: 8px;
+  background: rgba(214, 182, 106, 0.09);
+}
+
+.map-selection strong {
+  color: var(--gold);
+}
+
+.map-selection span {
+  color: var(--text-muted);
+  line-height: 1.35;
 }
 
 .list-link.active,
@@ -334,7 +529,7 @@ h1 {
 
 .timeline-range {
   display: grid;
-  grid-template-columns: auto minmax(5rem, 1fr) minmax(5rem, 1fr) auto;
+  grid-template-columns: auto minmax(5rem, 1fr) auto;
   gap: 0.6rem;
   align-items: center;
   margin-bottom: 0.85rem;
@@ -343,6 +538,22 @@ h1 {
 
 .timeline-range input {
   accent-color: var(--green);
+}
+
+.timeline-current-year {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+  color: var(--gold);
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.timeline-current-year small {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
 }
 
 .timeline-track {
@@ -493,9 +704,8 @@ h1 {
 
 @media (max-width: 1120px) {
   .filter-panel,
-  .dashboard-grid,
   .primary-grid,
-  .map-stage {
+  .dashboard-grid {
     grid-template-columns: 1fr;
   }
 
@@ -518,5 +728,33 @@ h1 {
   .stat-grid,
   .timeline-range {
     grid-template-columns: 1fr;
+  }
+
+  .map-panel {
+    min-height: 36rem;
+  }
+
+  .map-stage,
+  .leaflet-map-shell,
+  .leaflet-map {
+    min-height: 30rem;
+  }
+
+  .map-list {
+    position: static;
+    width: 100%;
+    max-height: none;
+    margin-top: 0.75rem;
+    backdrop-filter: none;
+  }
+
+  .map-legend {
+    top: 12rem;
+    bottom: auto;
+    width: min(15rem, calc(100% - 2rem));
+  }
+
+  .boundary-control {
+    width: min(15rem, calc(100% - 2rem));
   }
 }

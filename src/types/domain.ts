@@ -9,9 +9,16 @@ export type Battle = {
   longitude: number;
   locationName?: string;
   participants: string[];
+  participantNames?: string[];
+  winnerNames?: string[];
+  loserNames?: string[];
+  participant1Names?: string[];
+  participant2Names?: string[];
+  eventCountry?: string;
   result?: string;
   type?: string;
   description?: string;
+  source?: string;
 };
 
 export type War = {

@@ -2,7 +2,7 @@ import type { Battle, BattleFilters, BattleSummary, YearRange } from "../types/d
 
 export function getBattleYearRange(battles: Battle[]): YearRange {
   if (battles.length === 0) {
-    return [1500, 1945];
+    return [1886, 2003];
   }
 
   const years = battles.map((battle) => battle.year);

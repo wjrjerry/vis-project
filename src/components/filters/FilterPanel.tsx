@@ -42,9 +42,9 @@ export function FilterPanel({
       </div>
 
       <label className="field">
-        <span>War</span>
+        <span>Conflict group</span>
         <select value={selectedWarId ?? "all"} onChange={(event) => onWarChange(event.target.value)}>
-          <option value="all">All wars</option>
+          <option value="all">All conflict groups</option>
           {wars.map((war) => (
             <option key={war.id} value={war.id}>
               {war.name}
